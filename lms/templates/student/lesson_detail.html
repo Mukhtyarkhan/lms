@@ -1,0 +1,85 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Lesson Detail{% endblock %}
+
+{% block content %}
+<main>
+    <h1>{{ lesson.name }}</h1>
+
+    <div id="questions-container">
+        {% for question in questions %}
+        <div class="question-box" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd;">
+            <h3>Question {{ forloop.counter }}</h3>
+            <p>{{ question.text }}</p>
+
+            <form class="answer-form" data-question-id="{{ question.id }}">
+                {% csrf_token %}
+                <input type="text" name="answer" required>
+                <button type="submit">Submit</button>
+            </form>
+
+            <div class="result-box" style="margin-top: 10px; display: none;">
+                <p>Your answer: <span class="user-answer"></span></p>
+                <p>Score: <span class="score"></span>/10</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div id="total-score" style="margin-top: 20px;">
+        Total Score: <span id="score-value">0</span>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let totalScore = 0;
+
+        document.querySelectorAll('.answer-form').forEach(form => {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const questionId = this.dataset.questionId;
+                const resultBox = this.nextElementSibling;
+                const answerInput = this.querySelector('input[name="answer"]');
+                const submitButton = this.querySelector('button');
+                const csrftoken = this.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                fetch(`/teacher/lesson/submit-answer/${questionId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify({
+                        answer: answerInput.value
+                    })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Show result
+                        resultBox.style.display = 'block';
+                        resultBox.querySelector('.user-answer').textContent = data.answer;
+                        resultBox.querySelector('.score').textContent = data.score;
+
+                        totalScore += data.score;
+                        document.getElementById('score-value').textContent = totalScore;
+
+                        answerInput.disabled = true;
+                        submitButton.disabled = true;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error submitting answer. Please try again.');
+                    });
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}lesson_detial{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'style/result.css' %}">
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="container ">
+        <h2>Results for {{ lesson.name }}</h2>
+        <p>Course: {{ lesson.course.name }}</p>
+
+        {% if student_results %}
+        {% for student, results in student_results.items %}
+        <div class="card">
+            <div class="card-header">
+                <h3>Student: {{ student.username }}</h3>
+            </div>
+            <div class="card-body">
+                <div class="row ">
+                    <div class="col-md-3">
+                        <strong>Questions Answered:</strong>
+                        {{ results.answered_questions }}/{{ results.total_questions }}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Correct Answers:</strong>
+                        {{ results.correct_answers }}
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Score:</strong>
+                        {{ results.score_percentage|floatformat:1 }}%
+                    </div>
+                </div>
+
+                {% if results.answers %}
+                <h4>Detailed Answers</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>Student's Answer</th>
+                            <th>Correct Answer</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for answer in results.answers %}
+                        <tr class="{% if answer.score > 0 %}table-success{% else %}table-danger{% endif %}">
+                            <td>{{ answer.question.text }}</td>
+                            <td>{{ answer.answer }}</td>
+                            <td>{{ answer.question.correct_answer }}</td>
+                            <td>{{ answer.score }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No answers submitted yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="alert alert-info">
+            No students have taken this lesson's questions yet.
+        </div>
+        {% endif %}
+    </div>
+
+</main>
+
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}student_deshbord{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'style/teacher.css' %}">
+{% endblock %}
+
+{% block content %}
+<main style="padding: 2rem;">
+    <h1>Learning Dashboard</h1>
+
+    {% for course in courses %}
+    <div class="course-card">
+        <h2>Course: {{ course.name }}</h2>
+        <p>{{ course.description }}</p>
+
+
+
+        {% for lesson in course.lessons.all %}
+        <div class="lesson-card">
+            <h3>Lesson: {{ lesson.id }} {{ lesson.name }}</h3>
+            <p>{{ lesson.description }}</p>
+
+            <div class="actions">
+                <a href="{% url 'student_study_lesson' course.id lesson.id %}" class="btn">Study Lesson</a>
+            </div>
+
+
+        </div>
+        {% empty %}
+        <p>No lessons available in this course yet.</p>
+        {% endfor %}
+    </div>
+    {% empty %}
+    <p>You are not enrolled in any courses yet.</p>
+    {% endfor %}
+</main>
+
+{% endblock %}

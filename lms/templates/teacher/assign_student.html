@@ -1,0 +1,50 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}lesson_detial{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'style/student_as.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main">
+    <h1>Assign Students to {{ course.name }}</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <h2>Available Students to Enroll</h2>
+        <ul>
+            {% for student in available_students %}
+            <li>
+                <input type="checkbox" name="students" alt="   " value="{{ student.id }}" id="student_{{ student.id }}"
+                    {% if student in enrolled_students %} checked="checked" {% endif %}>
+
+                <label for="student_{{ student.id }}">
+                    {{ student.username }}
+                </label>
+            </li>
+            {% empty %}
+            <li>No available students found</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Currently Enrolled Students</h2>
+        <ul>
+            {% for student in enrolled_students %}
+            <li>
+                {{ student.username }}
+            </li>
+            {% empty %}
+            <li>No students currently enrolled</li>
+            {% endfor %}
+        </ul>
+
+        <div>
+            <button type="submit">Save Changes</button>
+            <a href="{% url 'course_detail' course.id %}">Back to Course</a>
+        </div>
+    </form>
+
+</main>
+{% endblock %}

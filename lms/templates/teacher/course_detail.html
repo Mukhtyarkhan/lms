@@ -1,0 +1,88 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Course{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'style/course_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="course-detail">
+        <h1>{{ course.name }}</h1>
+
+        {% if course.description %}
+        <p class="course-description">{{ course.description }}</p>
+        {% endif %}
+
+        <h2>Lessons</h2>
+        <ul class="lessons-list" id="lessons-list">
+            {% for lesson in lessons %}
+            <li class="lesson-item">
+                <a href="{% url 'teacher_lesson_detail' course.id lesson.id %}">
+                    {{ lesson.name }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <div class="actions">
+            <button id="create-lesson-btn" class="btn btn-primary">
+                Create New Lesson
+            </button>
+        </div>
+
+        <div id="create-lesson-form" class="hidden" , style="display: none">
+            <h2>Create Lesson for {{ course.name }}</h2>
+            <form id="lesson-form">
+                {% csrf_token %}
+                <label for="name">Lesson Name:</label>
+                <input type="text" id="name" name="name" required>
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" rows="4" cols="50" required></textarea>
+                <br>
+                <button type="submit" id="submit">Create</button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const createBtn = document.getElementById('create-lesson-btn');
+        const form = document.getElementById('create-lesson-form');
+
+
+        createBtn.onclick = () => {
+            createBtn.style.display = "none";
+            form.style.display = "block";
+        }
+
+        document.getElementById('lesson-form').onsubmit = async (e) => {
+            e.preventDefault();
+            form.style.display = "none";
+            createBtn.style.display = "block";
+
+
+            let formData = new FormData(e.target);
+            let response = await fetch("{% url 'create_lesson' course.id %}", {
+                method: 'POST',
+                headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value },
+                body: formData
+            });
+
+            if (response.ok) {
+                let data = await response.json();
+                document.getElementById('lessons-list').innerHTML += `
+                <li class="lesson-item">
+                    <a href="/teacher/teacher/lesson/${data.course_id}/${data.lesson_id}/">
+                        ${data.lesson_name}
+                    </a>
+                </li>
+            `;
+            }
+        };
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,15 @@
+<h1>Create Question for {{ lesson.name }}</h1>
+<form method="post">
+    {% csrf_token %}
+    <label for="question_type">Question Type:</label>
+    <select id="question_type" name="question_type" required>
+        {% for value, label in question_types %}
+        <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+    </select>
+    <label for="text">Question Text:</label>
+    <textarea id="text" name="text" required></textarea>
+    <label for="correct_answer">Correct Answer:</label>
+    <input type="text" id="correct_answer" name="correct_answer" required>
+    <button type="submit">Create</button>
+</form>

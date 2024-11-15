@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/static/style/login.css">
+</head>
+
+<body>
+
+    <section class="container">
+        <!-- Login Form -->
+        <div class="form">
+            <div class="form-content">
+                <header>Login</header>
+                <form action="{% url 'login' %}" method="post">
+                    {% csrf_token %}
+                    <div class="field">
+                        <input type="text" placeholder="Username" class="input" name="username" required>
+                        <!-- Show username errors -->
+                        <span class="error">{{ form.username.errors }}</span>
+                    </div>
+                    <div class="field">
+                        <input type="password" placeholder="Password" class="password" name="password" required>
+                        <!-- Show password errors -->
+                        <span class="error">{{ form.password.errors }}</span>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                    <!-- Display non-field errors, like 'Invalid login' -->
+                    <span class="error">{{ form.non_field_errors }}</span>
+                    {% endif %}
+
+                    <div class="form-link">
+                        <a href="#" class="forgot-pass">Forgot password?</a>
+                    </div>
+                    <div class="field">
+                        <button type="submit">Login</button>
+                    </div>
+                </form>
+                <div class="form-link">
+                    <span>Don't have an account? <a href="{% url 'signup' %}">Signup</a></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</body>
+
+</html>

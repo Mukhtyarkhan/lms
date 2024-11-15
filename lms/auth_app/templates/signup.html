@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup</title>
+    <link rel="stylesheet" href="/static/style/login.css">
+</head>
+
+<body>
+
+    <section class="container">
+
+        <div class="form">
+            <div class="form-content">
+                <header>Signup</header>
+                <form action="{% url 'signup' %}" method="post">
+                    {% csrf_token %}
+                    <div class="field">
+                        <input type="text" placeholder="Username" class="input" name="username" required>
+                        <span class="error">{{ form.username.errors }}</span>
+                    </div>
+                    <div class="field">
+                        <input type="email" placeholder="Email" class="input" name="email" required>
+                        <span class="error">{{ form.email.errors }}</span>
+                    </div>
+                    <div class="field">
+                        <input type="password" placeholder="Create password" class="password" name="password1" required>
+                        <span class="error">{{ form.password1.errors }}</span>
+                    </div>
+                    <div class="field">
+                        <input type="password" placeholder="Confirm password" class="password" name="password2"
+                            required>
+                        <span class="error">{{ form.password2.errors }}</span>
+                    </div>
+                    <!-- Add user type radio buttons -->
+                    <div class="user_type">
+                        <label>
+                            <input type="radio" name="user_type" value="admin" required> admin
+                        </label>
+                        <label>
+                            <input type="radio" name="user_type" value="teacher" required> teacher
+                        </label>
+                        <label>
+                            <input type="radio" name="user_type" value="student" required> student
+                        </label>
+                    </div>
+                    <div class="field button-field">
+                        <button type="submit">Signup</button>
+                    </div>
+                </form>
+                <div class="form-link">
+                    <span>Already have an account? <a href="{% url 'login' %}">Login</a></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</body>
+
+</html>

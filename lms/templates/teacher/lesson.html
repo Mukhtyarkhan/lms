@@ -1,0 +1,103 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}lesson_detail{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'style/lesson.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="main">
+    <h2>{{ course.name }}</h2>
+    <h3>Lesson: {{ lesson.name }}</h3>
+    <p>{{ lesson.description }}</p>
+
+    <h4>Questions:</h4>
+    <div id="questions-list">
+        {% if questions %}
+        <ul>
+            {% for question in questions %}
+            <li class="question-item">
+                <strong>Question:</strong> {{ question.text }}<br>
+                <strong>Type:</strong> {{ question.get_question_type_display }}<br>
+                <strong>Correct Answer:</strong> {{ question.correct_answer }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No questions added yet.</p>
+        {% endif %}
+    </div>
+
+    <button id="add-question-btn" class="btn">Add Question</button>
+
+    <div id="question-form-container" style="display: none;">
+        <h3>Add New Question</h3>
+        <form id="question-form">
+            {% csrf_token %}
+            <label for="question_type">Question Type:</label>
+            <select id="question_type" name="question_type" required>
+                {% for value, label in question_types %}
+                <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+            <label for="text">Question Text:</label>
+            <textarea id="text" name="text" required></textarea>
+            <label for="correct_answer">Correct Answer:</label>
+            <input type="text" id="correct_answer" name="correct_answer" required>
+            <button type="submit">Create</button>
+        </form>
+    </div>
+
+    <a href="{% url 'view_results' lesson.id %}" class="btn">View Results</a>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addQuestionBtn = document.getElementById('add-question-btn');
+        const formContainer = document.getElementById('question-form-container');
+        const questionForm = document.getElementById('question-form');
+        const questionsList = document.getElementById('questions-list');
+
+        addQuestionBtn.onclick = () => {
+            formContainer.style.display = 'block';
+            addQuestionBtn.style.display = 'none'
+        };
+
+        questionForm.onsubmit = function (e) {
+            e.preventDefault();
+
+            addQuestionBtn.style.display = 'block'
+            questionForm.reset();
+            formContainer.style.display = 'none';
+
+
+            const formData = new FormData(questionForm);
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            const response = fetch("{% url 'create_question' lesson.id %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                const data = response.json();
+                const newQuestion = `
+                    <li class="question-item">
+                        <strong>Question:</strong> ${formData.get('text')}<br>
+                        <strong>Type:</strong> ${document.getElementById('question_type').options[document.getElementById('question_type').selectedIndex].text}<br>
+                        <strong>Correct Answer:</strong> ${formData.get('correct_answer')}
+                    </li>
+                `;
+
+                questionsList.querySelector('ul').innerHTML += newQuestion;
+
+            }
+
+        };
+    });
+</script>
+{% endblock %}
